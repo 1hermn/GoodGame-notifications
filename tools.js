@@ -47,7 +47,7 @@ async function startAgenda(bot){
 
 async function register(userId, code){
     const body = {
-        redirect_uri: "/oauth/receivecode",
+        redirect_uri: "http://398241-hermn.tmweb.ru/token",
         client_id: config.gg.client_id,
         client_secret: config.gg.client_secret,
         code: code,
