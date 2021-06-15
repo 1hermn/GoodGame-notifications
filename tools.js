@@ -63,6 +63,7 @@ async function register(userId, code){
     })
     const status = res.status
     const json = await res.json()
+    console.log(json)
     if(status != 200){
         return 0
     }else {

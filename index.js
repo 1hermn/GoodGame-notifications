@@ -76,7 +76,7 @@ bot.command("favorites", async ctx => {
 
 async function respond(req, res, next) {
     console.log(req.query)
-    var ans = await tools.register(req.query.state, req.query.code)
+    var ans = await tools.register(Number(req.query.state), req.query.code)
     if(ans == 0){
         res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
     }else {
