@@ -8,7 +8,7 @@ const Agenda = require('agenda');
 
 var bt;
 
-const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/agenda${config.mongo.name}?authSource=admin` , options: {
+const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/${config.mongo.name}?authSource=admin` , options: {
             useNewUrlParser: true,
             useUnifiedTopology: true
         }}
