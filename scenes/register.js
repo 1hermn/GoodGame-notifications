@@ -1,8 +1,13 @@
 const { Scenes, Markup } = require('telegraf');
 const config = require('../config.json')
 const tools = require('../tools.js')
-//tools.js
-
+/*TODO: Предлагать:
+    Выбрать язык
+    Выбрать смещение по времени
+*/
+/*TODO:
+    добавить редирект на страницу сервера и опрос получен ли результат
+*/
 const registerScene = new Scenes.WizardScene(
     'register',
     (ctx) => {

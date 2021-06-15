@@ -4,6 +4,8 @@ const { User } = require("./models/User.js");
 const config = require('./config.json')
 const Agenda = require('agenda');
 
+//TODO: StreamRemain
+
 var bt;
 
 const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/agenda?authSource=admin` , options: {
@@ -19,12 +21,13 @@ agenda.define(
         const { to, streamer, start, game, streamName, link } = job.attrs.data;
 
         var date = new Date()
-        var strt = new Date(start*1000)
+        //TODO: offcet
+        var strt = new Date(start*1000 - 5*60*1000)
         var dif = ( strt - date ) / 1000
 
         var str = "Скоро начнётся стрим!\n"
         str+=`Стример: ${streamer}\n`
-        str+=`Ссылка: ${link}`
+        str+=`Ссылка: ${link}\n`
         str+=`Игра: ${game}\n`
         str+=`Название стрима: ${streamName}\n`
         bt.telegram.sendMessage(to, str)
@@ -161,6 +164,26 @@ async function updateUserStreamers(array, userId){
     await user.save()
 }
 
+async function parseFavoritesFor(json){
+    return(
+        `\nСтример: ${json.streamer.nickname}`+
+        `\nСсылка:${json[i].link}\nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}`+
+        `\n\tНазвание стрима: ${json.stream_title}\n${(json.broadcast != false) ?
+        `\tСтрим начался: ${timeConverter(json.broadcast.start)}` : `Начало стрима неизвестно`}` :
+        `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: `+
+        `${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}`+`
+        \n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
+    )
+}
+
+async function parseAnnounces(json) {
+    return("Обнаружен новый анонс: \n" +
+    `\n\tСтример: ${json.streamer.nickname}\n\t`+
+    `Ссылка:${json.link}\n\tНачало: ${timeConverter(json.broadcast.start)}`
+    +`\n\tИгра: ${json.broadcast.game}\n\tНазвание: ${json.broadcast.title}`)
+
+}
+
 async function getFavoritesMsg(userId){
     var json = await ggGet(userId, "favorites")
     if(json != 0) {
@@ -178,7 +201,8 @@ async function getFavoritesMsg(userId){
                     obj.announce_timestamp = json[i].broadcast.start
                 }
                 streamers_arr.push(obj)
-                msg += `\n=======================================\n${i + 1}\nСтример: ${json[i].streamer.nickname} \nСсылка:${json[i].link}\nСостояние: ${(json[i].status) ? `\n\tСтримит игру: ${json[i].game}\n\tНазвание стрима: ${json[i].stream_title}\n${(json[i].broadcast != false) ? `\tСтрим начался: ${timeConverter(json[i].broadcast.start)}` : `Начало стрима неизвестно`}` : `Не стримит. \nАнонс: ${(json[i].broadcast != false) ? `\n\tНачало: ${timeConverter(json[i].broadcast.start)}\n\tИгра: ${json[i].broadcast.game}\n\tНазвание: ${json[i].broadcast.title}` : `Анонс отсуствует`}`}`
+                var parsedObj = await parseFavoritesFor(json[i])
+                msg += `\n=======================================\n${i + 1}`+parsedObj
             }
         }else {
             var obj = {
@@ -191,7 +215,9 @@ async function getFavoritesMsg(userId){
                 obj.announce_timestamp = json.broadcast.start
             }
             streamers_arr.push(obj)
-            msg += `\n=======================================\n${i + 1}\nСтример: ${json.streamer.nickname}\nСсылка:${json.link} \nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}\n\tНазвание стрима: ${json.stream_title}\n${(json[i].broadcast != false) ? `\tСтрим начался: ${timeConverter(json.broadcast.start)}` : `Начало стрима неизвестно`}` : `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: ${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}\n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
+            var parsedObj = await parseFavoritesFor(json)
+            msg += `\n=======================================\n${i + 1}`+parsedObj
+            
         }
         await updateUserStreamers(streamers_arr,userId)
         return msg
@@ -214,7 +240,8 @@ async function findAnnounce(bot, user){
                         if (( user.favorites[j].announce_timestamp < json[i].broadcast.start)) {
                             if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json[i].broadcast.start) {
                                 user.favorites[j].announce_timestamp = json[i].broadcast.start
-                                bot.telegram.sendMessage(user.telegramId, "Обнаружен новый анонс: \n" + `\n\tСтример: ${json[i].streamer.nickname}\n\tСсылка:${json[i].link}\n\tНачало: ${timeConverter(json[i].broadcast.start)}\n\tИгра: ${json[i].broadcast.game}\n\tНазвание: ${json[i].broadcast.title}`)
+                                var msg = await parseAnnounces(json[i])
+                                bot.telegram.sendMessage(user.telegramId, msg)
                                 user.favorites[j].firstNotification = true
                             }
                             var date = new Date()
@@ -235,7 +262,8 @@ async function findAnnounce(bot, user){
                     }
                 }
                 if (notFound) {
-                    bot.telegram.sendMessage(user.telegramId, "Обнаружен новый анонс: \n" + `\n\tСтример: ${json[i].streamer.nickname}\n\tСсылка:${json[i].link}\n\tНачало: ${timeConverter(json[i].broadcast.start)}\n\tИгра: ${json[i].broadcast.game}\n\tНазвание: ${json[i].broadcast.title}`)
+                    var msg = await parseAnnounces(json[i])
+                    bot.telegram.sendMessage(user.telegramId, msg)
                     let obj = {
                         id: json[i].streamer.obj_key.split(':')[1],
                         announce_timestamp: json[i].broadcast.start,
@@ -269,7 +297,8 @@ async function findAnnounce(bot, user){
                     if (( user.favorites[j].announce_timestamp < json.broadcast.start)) {
                         if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json.broadcast.start) {
                             user.favorites[j].announce_timestamp = json.broadcast.start
-                            bot.telegram.sendMessage(user.telegramId, "Обнаружен новый анонс: \n" + `\n\tСтример: ${json.streamer.nickname}\n\tСсылка:${json.link}\n\tНачало: ${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}\n\tНазвание: ${json.broadcast.title}`)
+                            var msg = await parseAnnounces(json)
+                            bot.telegram.sendMessage(user.telegramId, msg)
                             user.favorites[j].firstNotification = true
                         }
                         var date = new Date()
@@ -290,7 +319,9 @@ async function findAnnounce(bot, user){
                 }
             }
             if (notFound) {
-                bot.telegram.sendMessage(user.telegramId, "Обнаружен новый анонс: \n" + `\n\tСтример: ${json.streamer.nickname}\n\tСсылка:${json.link}\n\tНачало: ${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}\n\tНазвание: ${json.broadcast.title}`)
+                var msg = await parseAnnounces(json)
+                bot.telegram.sendMessage(user.telegramId, msg)
+                user.favorites[j].firstNotification = true
                 let obj = {
                     id: json.streamer.obj_key.split(':')[1],
                     announce_timestamp: json.broadcast.start,
