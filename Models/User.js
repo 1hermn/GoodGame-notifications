@@ -10,6 +10,7 @@ const userScheme = new Schema({
     favorites: [
         {
             id: Number,
+            stream: Boolean,
             announce_timestamp: Number,
             firstNotification: Boolean,
             secondNotification: Boolean
