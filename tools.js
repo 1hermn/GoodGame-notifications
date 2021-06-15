@@ -36,6 +36,7 @@ agenda.define(
 );
 
 async function startAgenda(bot){
+    console.log(`mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/${config.mongo.name}?authSource=admin`)
     bt = bot;
     agenda.define("updateAnnounces", async (job) => {
         await updateAnnounces(bot)
