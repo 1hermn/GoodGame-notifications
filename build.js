@@ -11,6 +11,7 @@ async function readDB(){
     const collection = db.collection("JSONConfig");
     const json = (await collection.find({bot_name: package.name}).toArray())[0]
     fs.writeFileSync('config.json', JSON.stringify((json.config)).toString())
+    process.exit()
 }
 
 readDB()

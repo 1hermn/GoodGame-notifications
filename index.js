@@ -3,6 +3,7 @@ const config = require('./config.json')
 const tools = require('./tools.js')
 const mongoose = require('mongoose');
 const fs = require("fs");
+var restify = require('restify');
 
 //TODO: User offset
 
@@ -69,14 +70,43 @@ bot.command("register", ctx => {
 
 
 bot.command("favorites", async ctx => {
-    var msg = await tools.getFavoritesMsg(ctx.message.from.id)
-    ctx.reply(msg)
+    ctx.scene.enter("favorites")
 })
+
+
+async function respond(req, res, next) {
+    console.log(req.query)
+    var ans = await tools.register(req.query.state, req.query.code)
+    if(ans == 0){
+        res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
+    }else {
+        res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites")
+    }
+    next();
+}
+
 async function start() {
     await bot.launch()
     console.log("Телеграм-клиент запущен")
     await tools.startAgenda(bot)
 }
+
+var server = restify.createServer();
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.jsonp());
+server.use(restify.plugins.bodyParser({
+    mapParams: true
+}));
+
+server.get('/token', respond);
+server.get('/k', (req, res, next ) => {
+    res.send("Hello!")
+});
+
+server.listen(80, function() {
+    console.log('%s listening at %s', server.name, server.url);
+});
+
 start()
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'))
