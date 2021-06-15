@@ -8,7 +8,7 @@ const Agenda = require('agenda');
 
 var bt;
 
-const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/agenda?authSource=admin` , options: {
+const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${config.mongo.pass}@${config.mongo.ip_port}/agenda${config.mongo.name}?authSource=admin` , options: {
             useNewUrlParser: true,
             useUnifiedTopology: true
         }}
@@ -165,15 +165,17 @@ async function updateUserStreamers(array, userId){
 }
 
 async function parseFavoritesFor(json){
-    return(
-        `\nСтример: ${json.streamer.nickname}`+
-        `\nСсылка:${json[i].link}\nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}`+
-        `\n\tНазвание стрима: ${json.stream_title}\n${(json.broadcast != false) ?
-        `\tСтрим начался: ${timeConverter(json.broadcast.start)}` : `Начало стрима неизвестно`}` :
-        `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: `+
-        `${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}`+`
-        \n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
-    )
+    var obj = {
+        "streamer": json.streamer.nickname,
+        "text": `\nСтример: ${json.streamer.nickname}`+
+                `\nСсылка:${json.link}\nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}`+
+                `\n\tНазвание стрима: ${json.stream_title}\n${(json.broadcast != false) ?
+                `\tСтрим начался: ${timeConverter(json.broadcast.start)}` : `Начало стрима неизвестно`}` :
+                `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: `+
+                `${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}`+`
+                \n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
+    }
+    return obj
 }
 
 async function parseAnnounces(json) {
@@ -187,7 +189,7 @@ async function parseAnnounces(json) {
 async function getFavoritesMsg(userId){
     var json = await ggGet(userId, "favorites")
     if(json != 0) {
-        var msg = `Найденные подписки: \n`
+        var objects = []
         var streamers_arr = []
         if (json[0] !== undefined) {
             for (var i = 0; i < json.length; i++) {
@@ -202,7 +204,7 @@ async function getFavoritesMsg(userId){
                 }
                 streamers_arr.push(obj)
                 var parsedObj = await parseFavoritesFor(json[i])
-                msg += `\n=======================================\n${i + 1}`+parsedObj
+                objects.push(parsedObj)
             }
         }else {
             var obj = {
@@ -216,11 +218,11 @@ async function getFavoritesMsg(userId){
             }
             streamers_arr.push(obj)
             var parsedObj = await parseFavoritesFor(json)
-            msg += `\n=======================================\n${i + 1}`+parsedObj
+            objects.push(parsedObj)
             
         }
         await updateUserStreamers(streamers_arr,userId)
-        return msg
+        return objects
     }
     return "Ошибка"
 }
