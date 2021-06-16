@@ -62,7 +62,10 @@ bot.catch(async (err, ctx) =>{
     console.log("Ошибка: ", err)
 })
 
-
+stage.catch(async (err, ctx) =>{
+    ctx.reply("Произошла ошибка, свяжитесь с администратором")
+    console.log("Ошибка: ", err)
+})
 
 bot.command("register", ctx => {
     ctx.scene.enter("register")
