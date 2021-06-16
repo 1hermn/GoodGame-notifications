@@ -21,7 +21,7 @@ const registerScene = new Scenes.WizardScene(
         }else {
             ctx.reply("На один телеграм аккаунт только один пользователь!")
         }
-        ctx.scene.leave()
+        return ctx.scene.leave()
     })
 
 
