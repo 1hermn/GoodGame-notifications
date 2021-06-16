@@ -9,8 +9,9 @@ const tools = require('../tools.js')
 
 const registerScene = new Scenes.WizardScene(
     'register',
-    (ctx) => {
-        if(tools.chekUserById(ctx.message.from.id)) {
+   async (ctx) => {
+        var found = await tools.chekUserById(ctx.message.from.id)
+        if(found) {
             const date = new Date()
             const timestamp = date.getTime()
             const keyboard = Markup.inlineKeyboard([
