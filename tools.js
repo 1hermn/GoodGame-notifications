@@ -99,6 +99,7 @@ async function addUser(userId, json) {
 
 async function chekUserById(userId){
     var usr = await User.findOne({telegramId: Number(userId)})
+    console.log(usr == null)
     return usr == null
 }
 
