@@ -97,6 +97,11 @@ async function addUser(userId, json) {
     return 1
 }
 
+async function chekUserById(userId){
+    var usr = await User.findOne({telegramId: Number(userId)})
+    return usr == null
+}
+
 async function  getUserToken(userId){
     var usr = await User.findOne({telegramId: Number(userId)})
     if(usr != null && usr.access_token !== undefined){
@@ -407,5 +412,6 @@ module.exports = {
     getFavoritesMsg,
     updateAnnounces,
     startAgenda,
-    updateUserStreamers
+    updateUserStreamers,
+    chekUserById
 }

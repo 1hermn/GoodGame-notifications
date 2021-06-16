@@ -2,8 +2,6 @@ const { Scenes, Markup } = require('telegraf');
 const config = require('../config.json')
 const tools = require('../tools.js')
 
-var objects
-
 const chooseScene = new Scenes.WizardScene(
     'choose',
     async (ctx) => {
@@ -11,7 +9,7 @@ const chooseScene = new Scenes.WizardScene(
         ctx.session.user = {}
         ctx.session.user.id = ctx.message.from.id
         ctx.session.user.page = 0
-        objects = await tools.getFavoritesMsg(ctx.session.user.id)
+        ctx.session.user.objects = await tools.getFavoritesMsg(ctx.session.user.id)
         const buttons = await generate_menu(ctx)
         const inline = Markup.inlineKeyboard(buttons)
         ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
@@ -57,16 +55,16 @@ const chooseScene = new Scenes.WizardScene(
                     break;
                 }
                 case "save": {
-                    await tools.updateUserStreamers(objects[0],ctx.session.user.id)
+                    await tools.updateUserStreamers(ctx.session.user.objects[0],ctx.session.user.id)
                     await ctx.answerCbQuery("Сохранено")
                     ctx.deleteMessage()
                     return ctx.scene.leave()
                 }
                 default: {
                     //search in objects
-                    for(var i = 0; i < objects[0].length; i++) {
-                        if(objects[0][i].id === Number(ctx.update.callback_query.data)){
-                            objects[0][i].sendNotification = !objects[0][i].sendNotification
+                    for(var i = 0; i < ctx.session.user.objects[0].length; i++) {
+                        if(ctx.session.user.objects[0][i].id === Number(ctx.update.callback_query.data)){
+                            ctx.session.user.objects[0][i].sendNotification = !ctx.session.user.objects[0][i].sendNotification
                             ctx.answerCbQuery("Изменено")
                             var buttonsArray = await generate_menu(ctx)
                             var inline = Markup.inlineKeyboard(buttonsArray)
@@ -84,12 +82,13 @@ const chooseScene = new Scenes.WizardScene(
 async function generate_menu(ctx){
     let buttonsArray = [];
     try{
-        length = objects[1].length
+
+        length = ctx.session.user.objects[1].length
         console.log("Before: ", ctx.session.user.page)
         //FIXME
         let count = ( ctx.session.user.page - 3 >= 0) ? ctx.session.user.page - 3 : 0
         for(var i = count, k = 0; i < length && k < 3; ++i, k++){
-            var object = objects[1][i]
+            var object = ctx.session.user.objects[1][i]
             buttonsArray.push([Markup.button.callback( ( objects[0][i].sendNotification ? "✅" : "❌") + object.streamer,object.streamer_id)])
             ctx.session.user.page = i;
         }
