@@ -2,7 +2,6 @@ const { Scenes, Markup } = require('telegraf');
 const config = require('../config.json')
 const tools = require('../tools.js')
 
-var objects
 
 const favoritesScene = new Scenes.WizardScene(
     'favorites',
@@ -58,9 +57,9 @@ const favoritesScene = new Scenes.WizardScene(
                 default: {
                     //search in objects
                     let text = ""
-                    for(let i = 0; i < objects[1].length; i++) {
-                        if(objects[1][i].streamer == ctx.update.callback_query.data){
-                            text = objects[1][i].text
+                    for(let i = 0; i < ctx.session.user.objects[1].length; i++) {
+                        if(ctx.session.user.objects[1][i].streamer == ctx.update.callback_query.data){
+                            text = ctx.session.user.objects[1][i].text
                             break;
                         }
                     }
@@ -107,8 +106,8 @@ const favoritesScene = new Scenes.WizardScene(
 async function generate_menu(ctx){
     let buttonsArray = [];
     try{
-        objects = await tools.getFavoritesMsg(ctx.session.user.id)
-        length = objects[1].length
+        ctx.session.user.objects = await tools.getFavoritesMsg(ctx.session.user.id)
+        length = ctx.session.user.objects[1].length
         console.log("Before: ", ctx.session.user.page)
         //FIXME
         let count = ( ctx.session.user.page - 3 >= 0) ? ctx.session.user.page - 3 : 0
