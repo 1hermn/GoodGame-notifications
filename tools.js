@@ -166,9 +166,11 @@ async function updateUserStreamers(array, userId){
     await user.save()
 }
 
-async function parseFavoritesFor(json){
+async function parseFavoritesFor(json, send){
     var obj = {
         "streamer": json.streamer.nickname,
+        "streamer_id": json.streamer.obj_key.split(':')[1],
+        "send": send,
         "text": `\nСтример: ${json.streamer.nickname}`+
                 `\nСсылка:${json.link}\nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}`+
                 `\n\tНазвание стрима: ${json.stream_title}\n${(json.broadcast != false) ?
@@ -188,6 +190,16 @@ async function parseAnnounces(json) {
 
 }
 
+async function getFavoritesById(userId, streamerId){
+    var fav = await User.findOne({ telegramId: Number(userId) })
+    for(let i = 0; i < fav.favorites.length; i++){
+        if(fav.favorites[i].id == streamerId){
+            return fav.favorites[i]
+        }
+    }
+    return false
+}
+
 async function getFavoritesMsg(userId){
     var json = await ggGet(userId, "favorites")
     if(json != 0) {
@@ -195,36 +207,54 @@ async function getFavoritesMsg(userId){
         var streamers_arr = []
         if (json[0] !== undefined) {
             for (var i = 0; i < json.length; i++) {
-                var obj = {
-                    id: json[i].streamer.obj_key.split(':')[1],
-                    announce_timestamp: 0,
-                    firstNotification: false,
-                    secondNotification: false
-                }
-                if(json[i].broadcast != false){
-                    obj.announce_timestamp = json[i].broadcast.start
+                //Найти стримера в базе. Если надено - получить инфу, но не добавлять в базу
+                //если не найдено - добавить
+                var fav = await getFavoritesById(userId, json[i].streamer.obj_key.split(':')[1])
+                if(fav !== false){
+                    var obj = fav
+                    if(json[i].broadcast != false){
+                        obj.announce_timestamp = json[i].broadcast.start
+                    }
+                }else {
+                    var obj = {
+                        id: json[i].streamer.obj_key.split(':')[1],
+                        announce_timestamp: 0,
+                        firstNotification: false,
+                        secondNotification: false,
+                        sendNotification: false
+                    }
+                    if(json[i].broadcast != false){
+                        obj.announce_timestamp = json[i].broadcast.start
+                    }
                 }
                 streamers_arr.push(obj)
-                var parsedObj = await parseFavoritesFor(json[i])
+                var parsedObj = await parseFavoritesFor(json[i], obj.sendNotification)
                 objects.push(parsedObj)
             }
         }else {
-            var obj = {
-                id: json.streamer.obj_key.split(':')[1],
-                announce_timestamp: 0,
-                firstNotification: false,
-                secondNotification: false
+            var fav = await getFavoritesById(userId, json.streamer.obj_key.split(':')[1])
+            if(fav !== false){
+                var obj = fav
+            }else {
+                var obj = {
+                    id: json.streamer.obj_key.split(':')[1],
+                    announce_timestamp: 0,
+                    firstNotification: false,
+                    secondNotification: false,
+                    sendNotification: false
+                }
             }
             if(json.broadcast != false){
                 obj.announce_timestamp = json.broadcast.start
             }
             streamers_arr.push(obj)
-            var parsedObj = await parseFavoritesFor(json)
+            var parsedObj = await parseFavoritesFor(json, json.streamer.obj_key.split(':')[1])
             objects.push(parsedObj)
             
         }
+        var un = [streamers_arr, objects]
         await updateUserStreamers(streamers_arr,userId)
-        return objects
+        return un
     }
     return "Ошибка"
 }
@@ -237,11 +267,13 @@ async function findAnnounce(bot, user){
             //поиск стримера
             var notFound = true
             if(json[i].broadcast != false) {
+                var send;
                 for (var j = 0; j < user.favorites.length; j++) {
                     if (user.favorites[j].id == json[i].streamer.obj_key.split(':')[1]) {
+                        send = user.favorites[j].sendNotification
                         //найден стример.
                         notFound = false
-                        if (( user.favorites[j].announce_timestamp < json[i].broadcast.start)) {
+                        if (( user.favorites[j].announce_timestamp < json[i].broadcast.start) && send) {
                             if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json[i].broadcast.start) {
                                 user.favorites[j].announce_timestamp = json[i].broadcast.start
                                 var msg = await parseAnnounces(json[i])
@@ -269,6 +301,7 @@ async function findAnnounce(bot, user){
                     var msg = await parseAnnounces(json[i])
                     bot.telegram.sendMessage(user.telegramId, msg)
                     let obj = {
+                        sendNotification: false,
                         id: json[i].streamer.obj_key.split(':')[1],
                         announce_timestamp: json[i].broadcast.start,
                         firstNotification: true,
@@ -297,8 +330,9 @@ async function findAnnounce(bot, user){
             for (var j = 0; j < user.favorites.length; j++) {
                 if (user.favorites[j].id == json.streamer.obj_key.split(':')[1]) {
                     //найден стример.
+                    send = user.favorites[j].sendNotification
                     notFound = false
-                    if (( user.favorites[j].announce_timestamp < json.broadcast.start)) {
+                    if (( user.favorites[j].announce_timestamp < json.broadcast.start) && send) {
                         if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json.broadcast.start) {
                             user.favorites[j].announce_timestamp = json.broadcast.start
                             var msg = await parseAnnounces(json)
@@ -327,6 +361,7 @@ async function findAnnounce(bot, user){
                 bot.telegram.sendMessage(user.telegramId, msg)
                 user.favorites[j].firstNotification = true
                 let obj = {
+                    sendNotification: false,
                     id: json.streamer.obj_key.split(':')[1],
                     announce_timestamp: json.broadcast.start,
                     firstNotification: true,
@@ -371,5 +406,6 @@ module.exports = {
     ggGet,
     getFavoritesMsg,
     updateAnnounces,
-    startAgenda
+    startAgenda,
+    updateUserStreamers
 }

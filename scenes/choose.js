@@ -4,16 +4,17 @@ const tools = require('../tools.js')
 
 var objects
 
-const favoritesScene = new Scenes.WizardScene(
-    'favorites',
+const chooseScene = new Scenes.WizardScene(
+    'choose',
     async (ctx) => {
         ctx.reply("Получаю информацию о ваших подписках..")
         ctx.session.user = {}
         ctx.session.user.id = ctx.message.from.id
         ctx.session.user.page = 0
+        objects = await tools.getFavoritesMsg(ctx.session.user.id)
         const buttons = await generate_menu(ctx)
         const inline = Markup.inlineKeyboard(buttons)
-        ctx.reply("Выберите стримера, чтобы посмотреть информацию о нём", inline)
+        ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
         return ctx.wizard.next()
     },
     async (ctx) => {
@@ -30,7 +31,7 @@ const favoritesScene = new Scenes.WizardScene(
                         ctx.session.user.page = (tmp >= 3) ? tmp : 0;
                         var buttonsArray = await generate_menu(ctx)
                         var inline = Markup.inlineKeyboard(buttonsArray)
-                        ctx.editMessageText("Выберите стримера, чтобы посмотреть информацию о нём",
+                        ctx.editMessageText("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера",
                             inline)
                     }catch(e) {
                         throw "Не найдено!"
@@ -45,7 +46,7 @@ const favoritesScene = new Scenes.WizardScene(
                         ctx.session.user.page =  tmp
                         var buttonsArray = await generate_menu(ctx)
                         var inline = Markup.inlineKeyboard(buttonsArray)
-                        ctx.editMessageText("Выберите стримера, чтобы посмотреть информацию о нём",
+                        ctx.editMessageText("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера",
                             inline)
                     }catch(e) {
                         console.log(e)
@@ -55,69 +56,45 @@ const favoritesScene = new Scenes.WizardScene(
                     }
                     break;
                 }
+                case "save": {
+                    await tools.updateUserStreamers(objects[0],ctx.session.user.id)
+                    await ctx.answerCbQuery("Сохранено")
+                    ctx.deleteMessage()
+                    return ctx.scene.leave()
+                }
                 default: {
                     //search in objects
-                    let text = ""
-                    for(let i = 0; i < objects[1].length; i++) {
-                        if(objects[1][i].streamer == ctx.update.callback_query.data){
-                            text = objects[1][i].text
-                            break;
+                    for(var i = 0; i < objects[0].length; i++) {
+                        if(objects[0][i].id === Number(ctx.update.callback_query.data)){
+                            objects[0][i].sendNotification = !objects[0][i].sendNotification
+                            ctx.answerCbQuery("Изменено")
+                            var buttonsArray = await generate_menu(ctx)
+                            var inline = Markup.inlineKeyboard(buttonsArray)
+                            ctx.editMessageText("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера",
+                                inline)
                         }
                     }
-                    if(text != ""){
-                        var keyboard = Markup.inlineKeyboard([
-                            [Markup.button.callback("Назад","back")]
-                        ])
-                        ctx.editMessageText(text,
-                            keyboard)
-                        return ctx.wizard.next();
-                    }
                 }
             }
-        }else {
-            ctx.reply("Получаю информацию о ваших подписках..")
-            ctx.session.user = {}
-            ctx.session.user.id = ctx.message.from.id
-            ctx.session.user.page = 0
-            const buttons = await generate_menu(ctx)
-            const inline = Markup.inlineKeyboard(buttons)
-            ctx.reply("Выберите стримера, чтобы посмотреть информацию о нём", inline)
         }
 
-    },
-    async (ctx) => {
-        if(ctx.update.callback_query) {
-            switch (ctx.update.callback_query.data) {
-                case "back": {
-                    const buttons = await generate_menu(ctx)
-                    const inline = Markup.inlineKeyboard(buttons)
-                    ctx.editMessageText("Выберите стримера, чтобы посмотреть информацию о нём", inline)
-                    return ctx.wizard.back();
-                }
-            }
-        }else {
-            const buttons = await generate_menu(ctx)
-            const inline = Markup.inlineKeyboard(buttons)
-            ctx.reply("Выберите стримера, чтобы посмотреть информацию о нём", inline)
-            return ctx.wizard.back();
-        }
     }
 )
 
 async function generate_menu(ctx){
     let buttonsArray = [];
     try{
-        objects = await tools.getFavoritesMsg(ctx.session.user.id)
         length = objects[1].length
         console.log("Before: ", ctx.session.user.page)
         //FIXME
         let count = ( ctx.session.user.page - 3 >= 0) ? ctx.session.user.page - 3 : 0
         for(var i = count, k = 0; i < length && k < 3; ++i, k++){
             var object = objects[1][i]
-            buttonsArray.push([Markup.button.callback(object.streamer,object.streamer)])
+            buttonsArray.push([Markup.button.callback( ( objects[0][i].sendNotification ? "✅" : "❌") + object.streamer,object.streamer_id)])
             ctx.session.user.page = i;
         }
         console.log("After: ", ctx.session.user.page)
+        buttonsArray.push([Markup.button.callback("Сохранить", "save")])
         buttonsArray.push([Markup.button.callback("Закончить просмотр", "exit")])
         if(ctx.session.user.page / 3 >= 0 && ctx.session.user.page / 3 <= 1){
             if(length/3 >= 1){
@@ -153,5 +130,5 @@ async function generate_menu(ctx){
 }
 
 module.exports = {
-    scene: favoritesScene
+    scene: chooseScene
 }

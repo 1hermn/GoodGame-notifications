@@ -13,7 +13,8 @@ const userScheme = new Schema({
             stream: Boolean,
             announce_timestamp: Number,
             firstNotification: Boolean,
-            secondNotification: Boolean
+            secondNotification: Boolean,
+            sendNotification: {type: Boolean, default: false}
         }
     ]
 });

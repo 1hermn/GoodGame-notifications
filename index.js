@@ -73,6 +73,9 @@ bot.command("favorites", async ctx => {
     ctx.scene.enter("favorites")
 })
 
+bot.command("choose", ctx => {
+    ctx.scene.enter("choose")
+})
 
 async function respond(req, res, next) {
     console.log(req.query)
@@ -82,6 +85,8 @@ async function respond(req, res, next) {
         res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
     }else {
         res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites в боте")
+        bot.telegram.sendMessage(req.query.code, "Вы успешно зарегистрировались. С этой минуты бот начинает" +
+            "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
     }
     next();
 }
@@ -100,9 +105,6 @@ server.use(restify.plugins.bodyParser({
 }));
 
 server.get('/token', respond);
-server.get('/k', (req, res, next ) => {
-    res.send("Hello!")
-});
 
 server.listen(80, function() {
     console.log('%s listening at %s', server.name, server.url);
