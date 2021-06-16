@@ -113,7 +113,7 @@ async function generate_menu(ctx){
         //FIXME
         let count = ( ctx.session.user.page - 3 >= 0) ? ctx.session.user.page - 3 : 0
         for(var i = count, k = 0; i < length && k < 3; ++i, k++){
-            var object = objects[1][i]
+            var object = ctx.session.user.objects[1][i]
             buttonsArray.push([Markup.button.callback(object.streamer,object.streamer)])
             ctx.session.user.page = i;
         }

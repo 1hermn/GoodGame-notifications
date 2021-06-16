@@ -89,7 +89,7 @@ async function generate_menu(ctx){
         let count = ( ctx.session.user.page - 3 >= 0) ? ctx.session.user.page - 3 : 0
         for(var i = count, k = 0; i < length && k < 3; ++i, k++){
             var object = ctx.session.user.objects[1][i]
-            buttonsArray.push([Markup.button.callback( ( objects[0][i].sendNotification ? "✅" : "❌") + object.streamer,object.streamer_id)])
+            buttonsArray.push([Markup.button.callback( ( ctx.session.user.objects[0][i].sendNotification ? "✅" : "❌") + object.streamer,object.streamer_id)])
             ctx.session.user.page = i;
         }
         console.log("After: ", ctx.session.user.page)
