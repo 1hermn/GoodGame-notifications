@@ -20,7 +20,7 @@ const registerScene = new Scenes.WizardScene(
             ctx.reply("Для регистрации аккаунта в боте перейдите по ссылке и разрешите боту получать список подписок", keyboard)
         }else {
             ctx.reply("На один телеграм аккаунт только один пользователь!")
-            return ctx.scene.leave()
+            return ctx.scene.enter("choose")
         }
     })
 
