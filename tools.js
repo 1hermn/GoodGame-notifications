@@ -25,7 +25,7 @@ agenda.define(
         var strt = new Date(start*1000 - 5*60*1000)
         var dif = ( strt - date ) / 1000
 
-        var str = "Скоро начнётся стрим!\n"
+        var str = "Скоро начнётся стрим!(Через 5 минут)\n"
         str+=`Стример: ${streamer}\n`
         str+=`Ссылка: ${link}\n`
         str+=`Игра: ${game}\n`

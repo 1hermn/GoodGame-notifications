@@ -5,9 +5,6 @@ const tools = require('../tools.js')
     Выбрать язык
     Выбрать смещение по времени
 */
-/*TODO:
-    добавить редирект на страницу сервера и опрос получен ли результат
-*/
 const registerScene = new Scenes.WizardScene(
     'register',
     (ctx) => {
