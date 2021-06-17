@@ -25,15 +25,6 @@ async function encrypt(text){
     return encrypted
 }
 
-async function decrypt(encrypted){
-    var algorithm = 'aes256';
-    var key = config.hash_secret
-    var decipher = crypto.createDecipher(algorithm, key);
-    var decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-    console.log("Decrypt: ", decrypted.toString("utf-8"))
-    return decrypted.toString("utf-8")
-}
-
 agenda.define(
     "sendNotification",
     { priority: "high", concurrency: 10 },
