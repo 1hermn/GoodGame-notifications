@@ -306,6 +306,16 @@ async function findAnnounce(bot, user){
                         }
                     }
                 }
+                if (notFound) {
+                    let obj = {
+                        sendNotification: false,
+                        id: json[i].streamer.obj_key.split(':')[1],
+                        announce_timestamp: json[i].broadcast.start,
+                        firstNotification: false,
+                        secondNotification: false
+                    }
+                    user.favorites.push(obj)
+                }
             }
         }
     }else {
@@ -339,6 +349,16 @@ async function findAnnounce(bot, user){
                         break;
                     }
                 }
+            }
+            if (notFound) {
+                let obj = {
+                    sendNotification: false,
+                    id: json.streamer.obj_key.split(':')[1],
+                    announce_timestamp: json.broadcast.start,
+                    firstNotification: false,
+                    secondNotification: false
+                }
+                user.favorites.push(obj)
             }
         }
     }
