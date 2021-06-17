@@ -79,19 +79,30 @@ bot.command("choose", ctx => {
 
 async function respond(req, res, next) {
     console.log(req.query)
-    var found = await tools.chekUserById(Number(req.query.state))
-    if(found) {
-        var ans = await tools.register(Number(req.query.state), req.query.code)
-        console.log(ans)
-        if (ans == 0) {
-            res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
-        } else {
-            res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites в боте")
-            bot.telegram.sendMessage(Number(req.query.code), "Вы успешно зарегистрировались. С этой минуты бот начинает" +
-                "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
+    const arr = req.query.state.split('_')
+    if(arr[1] !== undefined) {
+        var decrypted = await tools.decrypt(arr[1])
+        if (decrypted === Number(arr[0])) {
+            var found = await tools.chekUserById(Number(arr[0]))
+
+            if (found) {
+                var ans = await tools.register(Number(arr[0]), req.query.code)
+                console.log(ans)
+                if (ans == 0) {
+                    res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
+                } else {
+                    res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites в боте")
+                    bot.telegram.sendMessage(Number(req.query.code), "Вы успешно зарегистрировались. С этой минуты бот начинает" +
+                        "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
+                }
+            } else {
+                res.send("Уже есть аккаунт")
+            }
+        }else {
+            res.send("Но-но, плохо пытаться ломать моего бота")
         }
     }else {
-        res.send("Уже есть аккаунт")
+        res.send("Но-но, плохо пытаться ломать моего бота")
     }
     next();
 }

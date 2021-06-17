@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const { User } = require("./models/User.js");
 const config = require('./config.json')
 const Agenda = require('agenda');
+const crypto = require('crypto');
+const assert = require('assert');
 
 //TODO: StreamRemain
 
@@ -13,6 +15,22 @@ const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${co
             useUnifiedTopology: true
         }}
 });
+
+async function encrypt(text){
+    var algorithm = 'aes256';
+    var key = config.hash_secret
+    var cipher = crypto.createCipheriv(algorithm, key);
+    var encrypted = cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
+    return encrypted
+}
+
+async function decrypt(encrypted){
+    var algorithm = 'aes256';
+    var key = config.hash_secret
+    var decipher = crypto.createDecipheriv(algorithm, key);
+    var decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
+    return decrypted
+}
 
 agenda.define(
     "sendNotification",
@@ -386,5 +404,7 @@ module.exports = {
     updateAnnounces,
     startAgenda,
     updateUserStreamers,
-    chekUserById
+    chekUserById,
+    encrypt,
+    decrypt
 }
