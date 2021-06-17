@@ -78,14 +78,17 @@ bot.command("choose", ctx => {
 
 async function respond(req, res, next) {
     console.log(req.query)
-    var ans = await tools.register(Number(req.query.state), req.query.code)
-    console.log(ans)
-    if(ans == 0){
-        res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
-    }else {
-        res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites в боте")
-        bot.telegram.sendMessage(Number(req.query.code), "Вы успешно зарегистрировались. С этой минуты бот начинает" +
-            "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
+    var found = await tools.chekUserById(ctx.message.from.id)
+    if(found) {
+        var ans = await tools.register(Number(req.query.state), req.query.code)
+        console.log(ans)
+        if (ans == 0) {
+            res.send("Произошла ошибка. Возможно вышло время действия токена или он отправлен не правильно. Повторите ваши действия")
+        } else {
+            res.send("Авторизация прошла успешно. Вы можете посмотреть информацию о своих подписках командой /favorites в боте")
+            bot.telegram.sendMessage(Number(req.query.code), "Вы успешно зарегистрировались. С этой минуты бот начинает" +
+                "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
+        }
     }
     next();
 }
