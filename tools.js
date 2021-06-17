@@ -303,7 +303,7 @@ async function findAnnounce(bot, user){
                                 `Не стримит. \nАнонс: ${(json[i].broadcast != false) ? `\n\tНачало: ` +
                                     `${timeConverter(json[i].broadcast.start)}\n\tИгра: ${json[i].broadcast.game}` + `
                                     \n\tНазвание: ${json[i].broadcast.title}` : `Анонс отсуствует`}`}`
-                        ctx.reply(msg)
+                        bot.telegram.sendMessage(user.telegramId, msg)
                         user.favorites[j].stream = true
 
                     }
@@ -370,7 +370,7 @@ async function findAnnounce(bot, user){
                             `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: ` +
                                 `${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}` + `
                                     \n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
-                    ctx.reply(msg)
+                    bot.telegram.sendMessage(user.telegramId, msg)
                     user.favorites[j].stream = true
 
                 }
