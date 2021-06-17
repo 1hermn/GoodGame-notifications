@@ -16,7 +16,8 @@ const userScheme = new Schema({
             secondNotification: Boolean,
             sendNotification: {type: Boolean, default: false}
         }
-    ]
+    ],
+    hash_secret: String
 });
 
 const User = mongoose.model("User", userScheme);
