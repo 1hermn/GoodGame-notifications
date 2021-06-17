@@ -10,8 +10,8 @@ const chooseScene = new Scenes.WizardScene(
         ctx.session.user.id = ctx.message.from.id
         ctx.session.user.page = 0
         ctx.session.user.objects = await tools.getFavoritesMsg(ctx.session.user.id)
-        const buttons = await generate_menu(ctx)
         try {
+        const buttons = await generate_menu(ctx)
             const inline = Markup.inlineKeyboard(buttons)
             ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
         }catch (e) {
