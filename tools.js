@@ -398,6 +398,5 @@ module.exports = {
     startAgenda,
     updateUserStreamers,
     chekUserById,
-    encrypt,
-    decrypt
+    encrypt
 }
