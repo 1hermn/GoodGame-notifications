@@ -155,7 +155,7 @@ async function ggGet(userId, path) {
 
 function timeConverter(UNIX_timestamp){
     var a = new Date(UNIX_timestamp * 1000);
-    var months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+    var months = ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'];
     var year = a.getFullYear();
     var month = months[a.getMonth()];
     var date = a.getDate();
