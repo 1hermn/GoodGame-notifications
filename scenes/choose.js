@@ -12,7 +12,9 @@ const chooseScene = new Scenes.WizardScene(
         ctx.session.user.objects = await tools.getFavoritesMsg(ctx.session.user.id)
         try {
         const buttons = await generate_menu(ctx)
-            console.log(buttons)
+            if(buttons[0][0].callback_data == undefined){
+                throw "Ошибка, зарегистрируйтесь в боте"
+            }
             const inline = Markup.inlineKeyboard(buttons)
             ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
         }catch (e) {
