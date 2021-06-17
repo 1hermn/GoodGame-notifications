@@ -44,7 +44,8 @@ bot.command("start", ctx => {
     ctx.reply("ВНИМАНИЕ. Администрация сервиса goodgame.ru не имеет отношения к этому боту. Бот работает на API"+
         "этого сервиса и не требует вашего логина и пароля.\n\nПозволяет получать уведомления о появившимся анонсе "+
         "стрима, а также об начале стрима(по времени анонса).\nДля подключения бота введите команду /register\nДля " +
-        "просмотра подписок введите /favorites"
+        "просмотра подписок введите /favorites " +
+        "помощь на команду /help"
     )
 })
 
@@ -78,7 +79,7 @@ bot.command("choose", ctx => {
 
 async function respond(req, res, next) {
     console.log(req.query)
-    var found = await tools.chekUserById(ctx.message.from.id)
+    var found = await tools.chekUserById(Number(req.query.state))
     if(found) {
         var ans = await tools.register(Number(req.query.state), req.query.code)
         console.log(ans)
@@ -89,6 +90,8 @@ async function respond(req, res, next) {
             bot.telegram.sendMessage(Number(req.query.code), "Вы успешно зарегистрировались. С этой минуты бот начинает" +
                 "получать анонсы от всех стримеров. Если вы хотите выбрать определённыех, введите команду /choose")
         }
+    }else {
+        res.send("Уже есть аккаунт")
     }
     next();
 }
