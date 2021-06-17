@@ -308,7 +308,9 @@ async function findAnnounce(bot, user){
 
                     }
                     if (!json[i].status) {
-                        bot.telegram.sendMessage(user.telegramId, `${json[i].streamer.nickname} закончил стримить`)
+                        if(!user.favorites[j].stream){
+                            bot.telegram.sendMessage(user.telegramId, `${json[i].streamer.nickname} закончил стримить`)
+                        }
                         user.favorites[j].stream = false
                     }
                     //найден стример.
@@ -376,7 +378,9 @@ async function findAnnounce(bot, user){
 
                 }
                 if (!json.status) {
-                    bot.telegram.sendMessage(user.telegramId, `${json.streamer.nickname} закончил стримить`)
+                    if(!user.favorites[j].stream){
+                        bot.telegram.sendMessage(user.telegramId, `${json.streamer.nickname} закончил стримить`)
+                    }
                     user.favorites[j].stream = false
                 }
                 if (json.broadcast != false) {
