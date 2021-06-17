@@ -30,8 +30,8 @@ async function decrypt(encrypted){
     var key = config.hash_secret
     var decipher = crypto.createDecipher(algorithm, key);
     var decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-    console.log("Decrypt: ", decrypted)
-    return decrypted
+    console.log("Decrypt: ", toString(decrypted))
+    return toString(decrypted)
 }
 
 agenda.define(

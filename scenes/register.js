@@ -13,7 +13,7 @@ const registerScene = new Scenes.WizardScene(
         var found = await tools.chekUserById(ctx.message.from.id)
         if(found) {
             const date = new Date()
-            var encrypted = tools.encrypt(ctx.message.from.id)
+            var encrypted = await tools.encrypt(ctx.message.from.id)
             const keyboard = Markup.inlineKeyboard([
                 [Markup.button.url("Перейти", `https://api2.goodgame.ru/oauth/authorize?response_type=code&client_id=${config.gg.client_id}&redirect_uri=http://398241-hermn.tmweb.ru/token&scope=user.favorites&state=${ctx.message.from.id}_${encrypted}`)]
             ])
