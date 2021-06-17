@@ -18,6 +18,7 @@ const registerScene = new Scenes.WizardScene(
                 [Markup.button.url("Перейти", `https://api2.goodgame.ru/oauth/authorize?response_type=code&client_id=${config.gg.client_id}&redirect_uri=http://398241-hermn.tmweb.ru/token&scope=user.favorites&state=${ctx.message.from.id}_${encrypted}`)]
             ])
             ctx.reply("Для регистрации аккаунта в боте перейдите по ссылке и разрешите боту получать список подписок", keyboard)
+            return ctx.scene.leave()
         }else {
             ctx.reply("На один телеграм аккаунт только один пользователь!")
             return ctx.scene.enter("choose")
