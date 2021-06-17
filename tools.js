@@ -306,31 +306,6 @@ async function findAnnounce(bot, user){
                         }
                     }
                 }
-                if (notFound && send) {
-                    var msg = await parseAnnounces(json[i])
-                    bot.telegram.sendMessage(user.telegramId, msg)
-                    let obj = {
-                        sendNotification: false,
-                        id: json[i].streamer.obj_key.split(':')[1],
-                        announce_timestamp: json[i].broadcast.start,
-                        firstNotification: true,
-                        secondNotification: false
-                    }
-                    var date = new Date()
-                    var start = new Date(json[i].broadcast.start*1000)
-                    var dif = Math.round(( start - date ) / 60000)
-                    console.log(dif)
-                    agenda.schedule(start - 5*60*1000, "sendNotification", {
-                        to: user.telegramId,
-                        link: json[i].link,
-                        game: json[i].broadcast.game,
-                        streamName: json[i].broadcast.title,
-                        streamer: json[i].streamer.nickname,
-                        start: start
-                    })
-                    console.log("Задача добавлена.")
-                    user.favorites.push(obj)
-                }
             }
         }
     }else {
@@ -364,32 +339,6 @@ async function findAnnounce(bot, user){
                         break;
                     }
                 }
-            }
-            if (notFound && send) {
-                var msg = await parseAnnounces(json)
-                bot.telegram.sendMessage(user.telegramId, msg)
-                user.favorites[j].firstNotification = true
-                let obj = {
-                    sendNotification: false,
-                    id: json.streamer.obj_key.split(':')[1],
-                    announce_timestamp: json.broadcast.start,
-                    firstNotification: true,
-                    secondNotification: false
-                }
-                var date = new Date()
-                var start = new Date(json.broadcast.start*1000)
-                var dif = Math.round(( start - date ) / 60000)
-                console.log(dif)
-                agenda.schedule(start, "sendNotification", {
-                    to: user.telegramId,
-                    link: json.link,
-                    game: json.broadcast.game,
-                    streamName: json.broadcast.title,
-                    streamer: json.streamer.nickname,
-                    start: start
-                })
-                console.log("Задача добавлена.")
-                user.favorites.push(obj)
             }
         }
     }
