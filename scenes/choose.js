@@ -127,7 +127,7 @@ async function generate_menu(ctx) {
                     Markup.button.callback('📝' + "1" + "/" + "1", "noth"),
                 ])
             }
-        } else if (page == countOfAllPage - 1) { // если это последняя страница
+        } else if (page == length - 1) { // если это последняя страница
             buttonsArray.push([
                 Markup.button.callback("⬅️", "back"),
                 Markup.button.callback('📝' + (page + 1) + "/" + countOfAllPage, "noth"),
