@@ -162,9 +162,9 @@ function timeConverter(UNIX_timestamp){
     var hour = a.getHours();
     var min = a.getMinutes();
     var sec = a.getSeconds();
-    if (hours   < 10) {hour   = "0"+hour;}
-    if (minutes < 10) {min = "0"+min;}
-    if (seconds < 10) {sec = "0"+sec;}
+    if (hour   < 10) {hour   = "0"+hour;}
+    if (min < 10) {min = "0"+min;}
+    if (sec < 10) {sec = "0"+sec;}
     var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
     return time;
 }
