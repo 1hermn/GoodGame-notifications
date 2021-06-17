@@ -82,7 +82,8 @@ async function respond(req, res, next) {
     const arr = req.query.state.split('_')
     if(arr[1] !== undefined) {
         var decrypted = await tools.decrypt(arr[1])
-        if (decrypted === Number(arr[0])) {
+        console.log(arr[0],decrypted)
+        if (Number(decrypted) === Number(arr[0])) {
             var found = await tools.chekUserById(Number(arr[0]))
 
             if (found) {
