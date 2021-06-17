@@ -78,11 +78,9 @@ bot.command("choose", ctx => {
 })
 
 async function respond(req, res, next) {
-    console.log(req.query)
     const arr = req.query.state.split('_')
     if(arr[1] !== undefined) {
         var encrypted = await tools.encrypt(arr[0])
-        console.log(arr[1],encrypted)
         if (encrypted == arr[1]) {
             var found = await tools.chekUserById(Number(arr[0]))
             if (found) {
