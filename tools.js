@@ -19,7 +19,7 @@ const agenda = new Agenda({ db: { address: `mongodb://${config.mongo.login}:${co
 async function encrypt(text){
     var algorithm = 'aes256';
     var key = config.hash_secret
-    var cipher = crypto.createCipheriv(algorithm, key);
+    var cipher = crypto.createCipher(algorithm, key);
     var encrypted = cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
     return encrypted
 }
@@ -27,7 +27,7 @@ async function encrypt(text){
 async function decrypt(encrypted){
     var algorithm = 'aes256';
     var key = config.hash_secret
-    var decipher = crypto.createDecipheriv(algorithm, key);
+    var decipher = crypto.createDecipher(algorithm, key);
     var decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
     return decrypted
 }
