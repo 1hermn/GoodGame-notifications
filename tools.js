@@ -293,6 +293,26 @@ async function findAnnounce(bot, user){
                         send = user.favorites[j].sendNotification
                         //найден стример.
                         notFound = false
+                        //chek for streams
+                        if(user.favorites[j].stream == undefined){
+                            user.favorites[j].stream = false
+                        }
+                        if(user.favorites[j].stream == false && json[i].status && send){
+                            let msg =
+                                    `\nСтример: ${json[i].streamer.nickname}`+
+                                    `\nСсылка:${json[i].link}\nСостояние: ${(json[i].status) ? `\n\tСтримит игру: ${json[i].game}`+
+                                    `\n\tНазвание стрима: ${json[i].stream_title}\n${(json.broadcast != false) ?
+                                    `\tСтрим начался: ${timeConverter(json[i].broadcast.start)}` : `Начало стрима неизвестно`}` :
+                                    `Не стримит. \nАнонс: ${(json[i].broadcast != false) ? `\n\tНачало: `+
+                                    `${timeConverter(json[i].broadcast.start)}\n\tИгра: ${json[i].broadcast.game}`+`
+                                    \n\tНазвание: ${json[i].broadcast.title}` : `Анонс отсуствует`}`}`
+                            ctx.reply(msg)
+                            user.favorites[j].stream = true
+
+                        }
+                        if(!json[i].status){
+                            user.favorites[j].stream = false
+                        }
                         if (( user.favorites[j].announce_timestamp < json[i].broadcast.start) && send) {
                             if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json[i].broadcast.start) {
                                 user.favorites[j].announce_timestamp = json[i].broadcast.start
@@ -337,6 +357,26 @@ async function findAnnounce(bot, user){
                     //найден стример.
                     send = user.favorites[j].sendNotification
                     notFound = false
+                    //chek for streams
+                    if(user.favorites[j].stream == undefined){
+                        user.favorites[j].stream = false
+                    }
+                    if(user.favorites[j].stream == false && json.status && send){
+                        let msg =
+                            `\nСтример: ${json.streamer.nickname}`+
+                            `\nСсылка:${json.link}\nСостояние: ${(json.status) ? `\n\tСтримит игру: ${json.game}`+
+                                `\n\tНазвание стрима: ${json.stream_title}\n${(json.broadcast != false) ?
+                                    `\tСтрим начался: ${timeConverter(json.broadcast.start)}` : `Начало стрима неизвестно`}` :
+                                `Не стримит. \nАнонс: ${(json.broadcast != false) ? `\n\tНачало: `+
+                                    `${timeConverter(json.broadcast.start)}\n\tИгра: ${json.broadcast.game}`+`
+                                    \n\tНазвание: ${json.broadcast.title}` : `Анонс отсуствует`}`}`
+                        ctx.reply(msg)
+                        user.favorites[j].stream = true
+
+                    }
+                    if(!json.status){
+                        user.favorites[j].stream = false
+                    }
                     if (( user.favorites[j].announce_timestamp < json.broadcast.start) && send) {
                         if (!user.favorites[j].firstNotification || user.favorites[j].announce_timestamp != json.broadcast.start) {
                             user.favorites[j].announce_timestamp = json.broadcast.start
