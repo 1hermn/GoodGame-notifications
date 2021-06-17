@@ -11,12 +11,16 @@ const favoritesScene = new Scenes.WizardScene(
         ctx.session.user.id = ctx.message.from.id
         ctx.session.user.page = 0
         const buttons = await generate_menu(ctx)
+        if(buttons[0][0].callback_data == undefined){
+            ctx.reply("Ошибка, зарегистрируйтесь в боте")
+            return ctx.scene.leave()
+        }
         try {
             const inline = Markup.inlineKeyboard(buttons)
             ctx.reply("Выберите стримера, чтобы посмотреть информацию о нём", inline)
         }catch (e) {
             ctx.reply("Ошибка, зарегистрируйтесь в боте")
-            throw e
+            return ctx.scene.leave()
         }
         return ctx.wizard.next()
     },

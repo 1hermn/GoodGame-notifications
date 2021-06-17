@@ -20,7 +20,7 @@ const chooseScene = new Scenes.WizardScene(
             ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
         }catch (e) {
             ctx.reply("Ошибка, зарегистрируйтесь в боте")
-            throw e
+            return ctx.scene.leave()
         }
         return ctx.wizard.next()
     },
