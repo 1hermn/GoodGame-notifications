@@ -20,7 +20,7 @@ async function encrypt(text){
     var algorithm = 'aes256';
     var key = config.hash_secret
     var cipher = crypto.createCipher(algorithm, key);
-    var encrypted = cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
+    var encrypted = cipher.update(toString(text), 'utf8', 'hex') + cipher.final('hex');
     return encrypted
 }
 
