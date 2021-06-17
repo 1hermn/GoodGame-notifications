@@ -13,7 +13,8 @@ const chooseScene = new Scenes.WizardScene(
         try {
         const buttons = await generate_menu(ctx)
             if(buttons[0][0].callback_data == undefined){
-                throw "Ошибка, зарегистрируйтесь в боте"
+                ctx.reply("Ошибка, зарегистрируйтесь в боте")
+                return ctx.scene.leave()
             }
             const inline = Markup.inlineKeyboard(buttons)
             ctx.reply("✅ - уведомления приходят. ❌ - уведомлений нет. Для изменения нажмите на стримера", inline)
