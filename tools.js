@@ -293,7 +293,7 @@ async function findAnnounce(bot, user){
                             var start = new Date(json[i].broadcast.start*1000)
                             var dif = Math.round(( start - date ) / 60000)
                             console.log(dif)
-                            agenda.schedule(start, "sendNotification", {
+                            agenda.schedule(start - 5*60*1000, "sendNotification", {
                                 to: user.telegramId,
                                 link: json[i].link,
                                 game: json[i].broadcast.game,
@@ -306,7 +306,7 @@ async function findAnnounce(bot, user){
                         }
                     }
                 }
-                if (notFound) {
+                if (notFound && send) {
                     var msg = await parseAnnounces(json[i])
                     bot.telegram.sendMessage(user.telegramId, msg)
                     let obj = {
@@ -320,7 +320,7 @@ async function findAnnounce(bot, user){
                     var start = new Date(json[i].broadcast.start*1000)
                     var dif = Math.round(( start - date ) / 60000)
                     console.log(dif)
-                    agenda.schedule(start, "sendNotification", {
+                    agenda.schedule(start - 5*60*1000, "sendNotification", {
                         to: user.telegramId,
                         link: json[i].link,
                         game: json[i].broadcast.game,
@@ -365,7 +365,7 @@ async function findAnnounce(bot, user){
                     }
                 }
             }
-            if (notFound) {
+            if (notFound && send) {
                 var msg = await parseAnnounces(json)
                 bot.telegram.sendMessage(user.telegramId, msg)
                 user.favorites[j].firstNotification = true
