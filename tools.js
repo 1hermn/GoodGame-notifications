@@ -290,6 +290,7 @@ async function findAnnounce(bot, user){
             for (var j = 0; j < user.favorites.length; j++) {
                 if (user.favorites[j].id == json[i].streamer.obj_key.split(':')[1]) {
                     send = user.favorites[j].sendNotification
+                    console.log(user.favorites[j].stream)
                     if (user.favorites[j].stream == undefined) {
                         user.favorites[j].stream = false
                     }
